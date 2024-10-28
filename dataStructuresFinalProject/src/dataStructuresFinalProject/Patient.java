@@ -13,8 +13,64 @@ public class Patient {
         this.severity = severity;
         this.arrivalTime = arrivalTime;
     }
+    
+    
 
-    @Override
+    /**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+
+	/**
+	 * @return the severity
+	 */
+	public int getSeverity() {
+		return severity;
+	}
+
+
+
+	/**
+	 * @param severity the severity to set
+	 */
+	public void setSeverity(int severity) {
+		this.severity = severity;
+	}
+
+
+
+	/**
+	 * @return the arrivalTime
+	 */
+	public int getArrivalTime() {
+		return arrivalTime;
+	}
+
+
+
+	/**
+	 * @param arrivalTime the arrivalTime to set
+	 */
+	public void setArrivalTime(int arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+
+
+	@Override
     public String toString() {
         return name + " (Severity: " + severity + ", Arrival: " + arrivalTime + ")";
     }

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class EmergencyAppointmentGUI {
     private EmergencyPriorityQueue priorityQueue;
@@ -53,8 +54,13 @@ public class EmergencyAppointmentGUI {
         JPanel actionPanel = new JPanel();
         JButton displayQueueButton = new JButton("Display Patient Queue");
         actionPanel.add(displayQueueButton);
+        
         JButton displayArrivalListButton = new JButton("Display Arrival List");
         actionPanel.add(displayArrivalListButton);
+        
+        JButton sortArrivalListButton = new JButton("Sort by Arrival Time");
+        actionPanel.add(sortArrivalListButton);
+
         frame.add(actionPanel, BorderLayout.SOUTH);
 
         // Action Listeners
@@ -83,6 +89,13 @@ public class EmergencyAppointmentGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 displayArrivalList();
+            }
+        });
+
+        sortArrivalListButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayArrivalListSorted();
             }
         });
 
@@ -133,9 +146,18 @@ public class EmergencyAppointmentGUI {
         displayArea.setText("Current Patient Queue (by severity):\n" + priorityQueue.getQueueString());
     }
 
-    // Method to display the Arrival List
+    // Method to display the Arrival List (unsorted)
     private void displayArrivalList() {
         displayArea.setText("Patient Arrival List:\n" + arrivalList.getArrivalListString());
+    }
+
+    // Method to display the Arrival List sorted by arrival time
+    private void displayArrivalListSorted() {
+        List<Patient> sortedList = arrivalList.getSortedByArrivalTime();
+        displayArea.setText("Patient Arrival List (Sorted by Arrival Time):\n");
+        for (Patient patient : sortedList) {
+            displayArea.append(patient + "\n");
+        }
     }
 
     public static void main(String[] args) {
