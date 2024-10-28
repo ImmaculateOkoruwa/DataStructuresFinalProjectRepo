@@ -30,4 +30,12 @@ public class PatientArrivalList {
     public int size() {
         return arrivalList.size();
     }
+    
+    public String getArrivalListString() {
+        StringBuilder sb = new StringBuilder();
+        for (Patient patient : arrivalList) {
+            sb.append(patient.toString()).append("\n");
+        }
+        return sb.toString();
+    } 
 }
