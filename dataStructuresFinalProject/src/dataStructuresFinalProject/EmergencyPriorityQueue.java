@@ -33,4 +33,12 @@ public class EmergencyPriorityQueue {
     public void displayQueue() {
         System.out.println("Current Queue: " + queue);
     }
+    
+    public String getQueueString() {
+        StringBuilder sb = new StringBuilder();
+        for (Patient patient : queue) {
+            sb.append(patient.toString()).append("\n");
+        }
+        return sb.toString();
+    }
 }
