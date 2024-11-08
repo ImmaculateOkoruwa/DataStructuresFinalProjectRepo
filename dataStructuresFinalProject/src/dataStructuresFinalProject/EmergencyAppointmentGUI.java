@@ -2,22 +2,25 @@ package dataStructuresFinalProject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class EmergencyAppointmentGUI {
     private EmergencyPriorityQueue priorityQueue;
     private PatientArrivalList arrivalList;
-    
+    private EmergencySeverityClassifier severityClassifier;
+
     // GUI components
     private JFrame frame;
     private JTextField nameField;
     private JTextField severityField;
     private JTextArea displayArea;
-    
+
     public EmergencyAppointmentGUI() {
         priorityQueue = new EmergencyPriorityQueue();
         arrivalList = new PatientArrivalList();
-        
+        severityClassifier = new EmergencySeverityClassifier(); // Initialize the severity classifier
+
         // Initialize GUI
         frame = new JFrame("Emergency Appointment System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,10 +36,10 @@ public class EmergencyAppointmentGUI {
         addPatientPanel.add(new JLabel("Severity (1-5):"));
         severityField = new JTextField();
         addPatientPanel.add(severityField);
-        
+
         JButton addPatientButton = new JButton("Add Patient");
         addPatientPanel.add(addPatientButton);
-        
+
         JButton treatPatientButton = new JButton("Treat Next Patient");
         addPatientPanel.add(treatPatientButton);
 
@@ -52,17 +55,40 @@ public class EmergencyAppointmentGUI {
         JPanel actionPanel = new JPanel();
         JButton displayQueueButton = new JButton("Display Patient Queue");
         actionPanel.add(displayQueueButton);
-        
+
         JButton displayArrivalListButton = new JButton("Display Arrival List");
         actionPanel.add(displayArrivalListButton);
 
         frame.add(actionPanel, BorderLayout.SOUTH);
 
         // Action Listeners
-        addPatientButton.addActionListener(e -> addPatient());
-        treatPatientButton.addActionListener(e -> treatPatient());
-        displayQueueButton.addActionListener(e -> displayQueue());
-        displayArrivalListButton.addActionListener(e -> displayArrivalList());
+        addPatientButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addPatient();
+            }
+        });
+
+        treatPatientButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                treatPatient();
+            }
+        });
+
+        displayQueueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayQueue();
+            }
+        });
+
+        displayArrivalListButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayArrivalList();
+            }
+        });
 
         frame.setVisible(true);
     }
@@ -71,7 +97,7 @@ public class EmergencyAppointmentGUI {
     private void addPatient() {
         String name = nameField.getText();
         int severity;
-        
+
         try {
             severity = Integer.parseInt(severityField.getText());
             if (severity < 1 || severity > 5) {
@@ -82,6 +108,9 @@ public class EmergencyAppointmentGUI {
             return;
         }
 
+        // Get severity description from the classifier
+        String severityDescription = severityClassifier.getSeverityDescription(severity);
+
         // For simplicity, using current system time as arrival time
         int arrivalTime = (int) (System.currentTimeMillis() / 1000);
 
@@ -89,11 +118,12 @@ public class EmergencyAppointmentGUI {
         Patient newPatient = new Patient(name, severity, arrivalTime);
         priorityQueue.addPatient(newPatient);
         arrivalList.addPatient(newPatient);
-        
+
         nameField.setText("");
         severityField.setText("");
-        
-        displayArea.append("Added: " + newPatient + "\n");
+
+        // Display the added patient's info with severity description
+        displayArea.append("Added: " + newPatient + "\nSeverity Level " + severity + ": " + severityDescription + "\n\n");
     }
 
     // Method to treat the next patient
@@ -111,16 +141,17 @@ public class EmergencyAppointmentGUI {
         displayArea.setText("Current Patient Queue (by severity):\n" + priorityQueue.getQueueString());
     }
 
-    // Method to display the Arrival List sorted by arrival time
+    // Method to display the Arrival List (unsorted)
     private void displayArrivalList() {
-        List<Patient> sortedList = arrivalList.getSortedByArrivalTime();
-        displayArea.setText("Patient Arrival List (Sorted by Arrival Time):\n");
-        for (Patient patient : sortedList) {
-            displayArea.append(patient + "\n");
-        }
+        displayArea.setText("Patient Arrival List:\n" + arrivalList.getArrivalListString());
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(EmergencyAppointmentGUI::new);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new EmergencyAppointmentGUI();
+            }
+        });
     }
 }
