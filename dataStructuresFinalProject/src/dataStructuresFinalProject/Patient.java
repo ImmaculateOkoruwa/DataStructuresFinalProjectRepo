@@ -9,6 +9,12 @@ public class Patient {
     int arrivalTime; // Sequential number to indicate arrival
 
     public Patient(String name, int severity, int arrivalTime) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty or null.");
+        }
+        if (severity < 1 || severity > 5) {
+            throw new IllegalArgumentException("Severity must be between 1 and 5.");
+        }
         this.name = name;
         this.severity = severity;
         this.arrivalTime = arrivalTime;

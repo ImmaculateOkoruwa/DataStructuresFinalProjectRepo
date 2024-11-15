@@ -95,8 +95,14 @@ public class EmergencyAppointmentGUI {
 
     // Method to add a patient to the system
     private void addPatient() {
-        String name = nameField.getText();
+        String name = nameField.getText().trim(); 
         int severity;
+
+        // Validate name
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Name cannot be empty. Please enter a valid name.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         try {
             severity = Integer.parseInt(severityField.getText());
