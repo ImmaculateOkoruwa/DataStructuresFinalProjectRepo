@@ -26,7 +26,7 @@ public class EmergencySeverityClassifier {
     public static void main(String[] args) {
         EmergencySeverityClassifier classifier = new EmergencySeverityClassifier();
 
-        // Example usage
+        // Testing the Map
         int severityLevel = 4;
         System.out.println("Severity Level " + severityLevel + ": " + classifier.getSeverityDescription(severityLevel));
     }

@@ -5,109 +5,124 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * GUI for the Emergency Appointment System.
+ * Manages patient data, including name validation and queue operations.
+ */
 public class EmergencyAppointmentGUI {
-    private EmergencyPriorityQueue priorityQueue;
-    private PatientArrivalList arrivalList;
-    private EmergencySeverityClassifier severityClassifier;
+    private EmergencyPriorityQueue priorityQueue; // Priority Queue to manage patients by severity
+    private PatientArrivalList arrivalList;      // List to track patient arrivals
+    private EmergencySeverityClassifier severityClassifier; // Severity description provider
 
     // GUI components
-    private JFrame frame;
-    private JTextField nameField;
-    private JTextField severityField;
-    private JTextArea displayArea;
+    private JFrame frame;              // Main application window
+    private JTextField nameField;      // Input field for patient name
+    private JTextField severityField;  // Input field for patient severity
+    private JTextArea displayArea;     // Area to display system messages and patient lists
 
     public EmergencyAppointmentGUI() {
+        // Initialize system components
         priorityQueue = new EmergencyPriorityQueue();
         arrivalList = new PatientArrivalList();
-        severityClassifier = new EmergencySeverityClassifier(); // Initialize the severity classifier
+        severityClassifier = new EmergencySeverityClassifier();
 
-        // Initialize GUI
+        // Setup the main frame
         frame = new JFrame("Emergency Appointment System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 400);
         frame.setLayout(new BorderLayout());
 
-        // North panel - Add patient form
+        // Create the "Add Patient" form in the North section of the window
         JPanel addPatientPanel = new JPanel(new GridLayout(3, 2));
         addPatientPanel.add(new JLabel("Patient Name:"));
-        nameField = new JTextField();
+        nameField = new JTextField(); // Input for patient's name
         addPatientPanel.add(nameField);
 
         addPatientPanel.add(new JLabel("Severity (1-5):"));
-        severityField = new JTextField();
+        severityField = new JTextField(); // Input for severity level
         addPatientPanel.add(severityField);
 
-        JButton addPatientButton = new JButton("Add Patient");
+        JButton addPatientButton = new JButton("Add Patient"); // Button to add a new patient
         addPatientPanel.add(addPatientButton);
 
-        JButton treatPatientButton = new JButton("Treat Next Patient");
+        JButton treatPatientButton = new JButton("Treat Next Patient"); // Button to treat the next patient
         addPatientPanel.add(treatPatientButton);
 
-        frame.add(addPatientPanel, BorderLayout.NORTH);
+        frame.add(addPatientPanel, BorderLayout.NORTH); // Add the form to the top of the frame
 
-        // Center panel - Display area
+        // Create the display area in the Center section of the window
         displayArea = new JTextArea();
-        displayArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(displayArea);
+        displayArea.setEditable(false); // Make display area read-only
+        JScrollPane scrollPane = new JScrollPane(displayArea); // Add scroll functionality
         frame.add(scrollPane, BorderLayout.CENTER);
 
-        // South panel - Buttons for actions
+        // Create action buttons in the South section of the window
         JPanel actionPanel = new JPanel();
-        JButton displayQueueButton = new JButton("Display Patient Queue");
+        JButton displayQueueButton = new JButton("Display Patient Queue"); // Button to show priority queue
         actionPanel.add(displayQueueButton);
 
-        JButton displayArrivalListButton = new JButton("Display Arrival List");
+        JButton displayArrivalListButton = new JButton("Display Arrival List"); // Button to show arrival list
         actionPanel.add(displayArrivalListButton);
 
-        frame.add(actionPanel, BorderLayout.SOUTH);
+        frame.add(actionPanel, BorderLayout.SOUTH); // Add buttons to the bottom of the frame
 
-        // Action Listeners
+        // Add action listeners for button functionality
         addPatientButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addPatient();
+                addPatient(); // Handle adding a patient
             }
         });
 
         treatPatientButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                treatPatient();
+                treatPatient(); // Handle treating the next patient
             }
         });
 
         displayQueueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                displayQueue();
+                displayQueue(); // Display the priority queue
             }
         });
 
         displayArrivalListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                displayArrivalList();
+                displayArrivalList(); // Display the arrival list
             }
         });
 
-        frame.setVisible(true);
+        frame.setVisible(true); // Make the frame visible
     }
 
-    // Method to add a patient to the system
+    /**
+     * Adds a patient to the system after validating input.
+     */
     private void addPatient() {
-        String name = nameField.getText().trim(); 
+        String name = nameField.getText().trim(); // Get and trim the name input
         int severity;
 
-        // Validate name
+        // Validate the name
         if (name.isEmpty()) {
             JOptionPane.showMessageDialog(frame, "Name cannot be empty. Please enter a valid name.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (!name.matches("[a-zA-Z ]+")) {
+            JOptionPane.showMessageDialog(frame, "Name can only contain alphabetic characters and spaces.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        // Format the name: capitalize each word
+        name = formatName(name);
+
+        // Validate the severity
         try {
             severity = Integer.parseInt(severityField.getText());
             if (severity < 1 || severity > 5) {
-                throw new NumberFormatException("Severity must be between 1 and 5");
+                throw new NumberFormatException("Severity must be between 1 and 5.");
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Please enter a valid severity (1-5).", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -117,14 +132,15 @@ public class EmergencyAppointmentGUI {
         // Get severity description from the classifier
         String severityDescription = severityClassifier.getSeverityDescription(severity);
 
-        // For simplicity, using current system time as arrival time
+        // Use the current system time as the arrival time
         int arrivalTime = (int) (System.currentTimeMillis() / 1000);
 
-        // Create new patient and add to both PriorityQueue and LinkedList
+        // Create a new patient and add to both PriorityQueue and LinkedList
         Patient newPatient = new Patient(name, severity, arrivalTime);
         priorityQueue.addPatient(newPatient);
         arrivalList.addPatient(newPatient);
 
+        // Clear the input fields for new entries
         nameField.setText("");
         severityField.setText("");
 
@@ -132,31 +148,55 @@ public class EmergencyAppointmentGUI {
         displayArea.append("Added: " + newPatient + "\nSeverity Level " + severity + ": " + severityDescription + "\n\n");
     }
 
-    // Method to treat the next patient
+    /**
+     * Treats the next patient from the priority queue.
+     */
     private void treatPatient() {
         if (priorityQueue.isEmpty()) {
             displayArea.append("No patients to treat.\n");
         } else {
-            Patient treated = priorityQueue.treatPatient();
+            Patient treated = priorityQueue.treatPatient(); // Remove the highest priority patient
             displayArea.append("Treated: " + treated + "\n");
         }
     }
 
-    // Method to display the Priority Queue
+    /**
+     * Displays the current priority queue.
+     */
     private void displayQueue() {
         displayArea.setText("Current Patient Queue (by severity):\n" + priorityQueue.getQueueString());
     }
 
-    // Method to display the Arrival List (unsorted)
+    /**
+     * Displays the patient arrival list in order of arrival.
+     */
     private void displayArrivalList() {
         displayArea.setText("Patient Arrival List:\n" + arrivalList.getArrivalListString());
+    }
+
+    /**
+     * Formats the name to capitalize the first letter of each word.
+     * @param name The raw name input.
+     * @return Formatted name.
+     */
+    private String formatName(String name) {
+        String[] words = name.toLowerCase().split("\\s+");
+        StringBuilder formattedName = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                formattedName.append(Character.toUpperCase(word.charAt(0)))
+                             .append(word.substring(1))
+                             .append(" ");
+            }
+        }
+        return formattedName.toString().trim();
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new EmergencyAppointmentGUI();
+                new EmergencyAppointmentGUI(); // Start the GUI
             }
         });
     }
