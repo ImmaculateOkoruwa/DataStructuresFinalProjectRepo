@@ -76,9 +76,9 @@ public class EmergencyPriorityQueue {
      */
     public String getQueueString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Priority Queue:\n");
-        for (Patient patient : queue) {
-            sb.append(patient).append("\n");
+        PriorityQueue<Patient> tempQueue = new PriorityQueue<>(queue);
+        while (!tempQueue.isEmpty()) {
+            sb.append(tempQueue.poll()).append("\n");
         }
         return sb.toString();
     }
